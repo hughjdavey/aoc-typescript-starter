@@ -68,21 +68,36 @@ const runDay = (day: Day): void => {
   const { result: partTwoResult, time: partTwoTime } = runPart(day, 2);
   const padding = Math.max(partOneResult.length, partTwoResult.length) + 14; // 14 is 8 (length of 'Part 1: ') + 6 more
   console.log(`=== DAY ${day.dayNumber} ===`);
-  console.log(`Part 1: ${partOneResult.padEnd(padding)} (${partOneTime}ns)`);
-  console.log(`Part 2: ${partTwoResult.padEnd(padding)} (${partTwoTime}ns)`);
+  console.log(`Part 1: ${partOneResult.padEnd(padding)} (${partOneTime})`);
+  console.log(`Part 2: ${partTwoResult.padEnd(padding)} (${partTwoTime})`);
   console.log();
 };
 
-const runPart = (day: Day, partNumber: 1 | 2): { result: string; time: number } => {
+const runPart = (day: Day, partNumber: 1 | 2): { result: string; time: string } => {
   const partFunction = partNumber === 1 ? () => day.partOne() : () => day.partTwo();
   try {
     const startTime = process.hrtime();
     const result = partFunction();
-    const time = process.hrtime(startTime)[1];
-    return { result: typeof result === 'string' ? result : JSON.stringify(result), time };
+    const timeInNs = process.hrtime(startTime)[1];
+    return {
+      result: typeof result === 'string' ? result : JSON.stringify(result),
+      time: getReadableTime(timeInNs),
+    };
   } catch (error) {
     const message = error instanceof Error ? error.message : JSON.stringify(error);
     throw new Error(`Error running day ${day.dayNumber} part ${partNumber} - ${message}`);
+  }
+};
+
+const getReadableTime = (timeInNs: number): string => {
+  if (timeInNs > 1_000_000_000) {
+    return `${(timeInNs / 1_000_000_000).toFixed(3)}s`
+  } else if (timeInNs > 1_000_000) {
+    return `${(timeInNs / 1_000_000).toFixed(3)}ms`
+  } else if (timeInNs > 1_000) {
+    return `${(timeInNs / 1_000).toFixed(3)}µs`
+  } else {
+    return `${timeInNs}ns`
   }
 };
 
