@@ -1,7 +1,7 @@
 module.exports = async () => {
   return {
     transform: {
-      '^.+\\.tsx?$': 'esbuild-jest',
+      '^.+\\.tsx?$': '@swc/jest',
     },
     verbose: true,
   };
